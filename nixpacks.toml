@@ -1,0 +1,13 @@
+[phases.setup]
+packages = ["nodejs" "npm" "unzip" "wget" "ca-certificates"]
+
+[phases.build]
+commands = [
+  "npm install",
+  "npm run build",
+  "wget https://github.com/pocketbase/pocketbase/releases/download/v0.34.2/pocketbase_0.34.2_linux_amd64.zip -O /tmp/pb.zip",
+  "unzip /tmp/pb.zip -d ./"
+]
+
+[phases.start]
+command = "./pocketbase serve --http=0.0.0.0:8090 --publicDir=./pb_public --dir=./pb_data --migrationsDir=./pb_migrations"
