@@ -16,7 +16,7 @@ export function parseTagGroup(record: RecordModel): TagGroup {
     }
 }
 
-export function parseTagList(records: RecordModel[]): TagGroup[] {
+export function parseTagGroupList(records: RecordModel[]): TagGroup[] {
     const tags: TagGroup[] = []
 
     for (const record of records) {

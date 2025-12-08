@@ -162,3 +162,8 @@ thead tr {
 thead th {
     @apply text-primary-foreground;
 }
+
+div[data-slot='sidebar'] {
+    --sidebar-width: 25rem;
+    --sidebar-width-mobile: 20rem;
+}

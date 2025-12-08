@@ -1,6 +1,6 @@
 import TagBadge from '@/components/custom-ui/tag-badge'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type Link from '@/types/link'
 import type Tag from '@/types/tags'
 import { type ColumnDef } from '@tanstack/react-table'
@@ -13,9 +13,26 @@ export const columns: ColumnDef<Link>[] = [
         cell: ({ row }) => {
             const name: string = row.getValue('name')
             const description: string = row.original.description
+            const createdDate: string = row.original.created.toLocaleString()
+            const updatedDate: string = row.original.updated.toLocaleString()
+
             return (
-                <div className="flex flex-col">
-                    <span className="font-bold">{name || ''}</span>
+                <div className="flex flex-col min-w-75">
+                    <div className="flex flex-row gap-2">
+                        <span className="font-bold text-lg">{name || ''} </span>
+                        <Popover>
+                            <PopoverTrigger>
+                                <Clock size="1.25rem" />
+                            </PopoverTrigger>
+                            <PopoverContent>Creado: {createdDate.toLocaleString()}</PopoverContent>
+                        </Popover>
+                        <Popover>
+                            <PopoverTrigger>
+                                <ClockArrowUp size="1.25rem" />
+                            </PopoverTrigger>
+                            <PopoverContent>Actualizado: {updatedDate.toLocaleString()}</PopoverContent>
+                        </Popover>
+                    </div>
                     <span dangerouslySetInnerHTML={{ __html: description }}></span>
                 </div>
             )
@@ -28,7 +45,7 @@ export const columns: ColumnDef<Link>[] = [
             const tags: Tag[] = row.getValue('tags')
 
             return (
-                <div key={row.id} className="flex flex-wrap gap-1 items-center">
+                <div key={row.id} className="flex flex-wrap gap-1 items-center min-w-75">
                     {tags.map((tag) => (
                         <TagBadge key={tag.id} tag={tag} />
                     ))}
@@ -47,39 +64,18 @@ export const columns: ColumnDef<Link>[] = [
             }
 
             return (
-                <div className="flex flex-row gap-1 items-center">
-                    <a href={url} className="mr-5 underline max-w-50 underline-offset-2 wrap-break-word overflow-clip">
+                <div className="flex flex-row gap-3 items-center ">
+                    <a href={url} className="max-w-50 underline underline-offset-2 wrap-break overflow-clip">
                         {url}
                     </a>
-                    <Button size="sm" onClick={copyUrl}>
+                    <Button variant="outline" size="sm" onClick={copyUrl}>
                         <Copy />
                     </Button>
                     <a href={url}>
-                        <Button size="sm" onClick={copyUrl}>
+                        <Button variant="outline" size="sm" onClick={copyUrl}>
                             <ArrowUpRight />
                         </Button>
                     </a>
-                </div>
-            )
-        },
-    },
-    {
-        accessorKey: 'date',
-        header: 'Fecha creación / edición',
-        cell: ({ row }) => {
-            const createdDate: Date = row.original.created
-            const updatedDate: Date = row.original.updated
-
-            return (
-                <div className="flex flex-col gap-1">
-                    <Badge variant="outline" className="font-light">
-                        <Clock />
-                        <span>{createdDate.toLocaleString()}</span>
-                    </Badge>
-                    <Badge variant="outline" className="font-light">
-                        <ClockArrowUp />
-                        <span>{updatedDate.toLocaleString()}</span>
-                    </Badge>
                 </div>
             )
         },

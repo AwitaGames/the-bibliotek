@@ -4,7 +4,7 @@ import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tan
 
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -51,24 +51,8 @@ export function DataTable<TData, TValue>({
 
     return (
         <div className="rounded-md border w-full">
-            <ScrollArea className="relative max-h-[60vh] overflow-auto">
-                <Table className="relative overflow-auto">
-                    <TableHeader className="sticky top-0">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-
+            <ScrollArea className="relative max-h-[70vh] overflow-auto">
+                <Table className="relative! overflow-auto">
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (

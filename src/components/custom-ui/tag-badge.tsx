@@ -19,7 +19,7 @@ export default function TagBadge({
     return (
         <Badge
             key={tag.id}
-            className="cursor-pointer select-none"
+            className="cursor-pointer select-none border-2 px-2 font-normal "
             variant={selected ? 'default' : 'outline'}
             onClick={() => onTagClick()}
             style={{

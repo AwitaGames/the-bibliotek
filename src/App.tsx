@@ -6,13 +6,21 @@ import PocketBase from 'pocketbase'
 import { useEffect, useState } from 'react'
 
 import CustomCheckbox from '@/components/custom-ui/checkbox'
-import TagBadge from '@/components/custom-ui/tag-badge'
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import TagFilter from '@/components/custom-ui/tag-filter'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarHeader,
+    SidebarProvider,
+} from '@/components/ui/sidebar'
+import type TagGroup from '@/types/tag-groups'
+import { parseTagGroupList } from '@/types/tag-groups'
 import type Tag from '@/types/tags'
 import { parseTagList } from '@/types/tags'
-import { ChevronsUpDown, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_POCKETBASE_URL
 
@@ -21,6 +29,8 @@ export default function App() {
     const [links, setLinks] = useState<Link[]>([])
     // Tags
     const [tags, setTags] = useState<Tag[]>([])
+    // Tag Groups
+    const [tagGroups, setTagGroups] = useState<TagGroup[]>([])
     // Filters
     const [textFilter, setTextFilter] = useState<string>('')
     const [nameFilter, setNameFilter] = useState<boolean>(true)
@@ -32,8 +42,6 @@ export default function App() {
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [totalPages, setTotalPages] = useState<number>(1)
     const [perPage, setPerPage] = useState<number>(25)
-
-    const [tagsOpen, setTagsOpen] = useState<boolean>(false)
 
     useEffect(() => {
         const getData = async () => {
@@ -96,116 +104,100 @@ export default function App() {
             tags.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
             setTags(tags)
 
+            // Tag groups
+            const tagGroupsResult = await pb.collection('tag_groups').getList(1, 999, {})
+
+            const tagGroups: TagGroup[] = parseTagGroupList(tagGroupsResult.items)
+            tagGroups.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+            setTagGroups(tagGroups)
+
             // Filters
         }
 
         getData()
     }, [currentPage, perPage, textFilter, nameFilter, descFilter, urlFilter, tagsFilter, forceTagsFilter])
 
-    const onTagClick = (tagId: string) => {
-        if (tagsFilter.includes(tagId)) {
-            setTagsFilter((prev) => {
-                return prev.filter((elem) => elem != tagId)
-            })
-        } else {
-            setTagsFilter((prev) => {
-                if (prev.includes(tagId)) return prev
-                return [...prev, tagId]
-            })
-        }
-    }
-
     return (
         <>
-            <div className="w-full px-10 flex flex-col gap-10 pt-10 justify-center mx-auto">
-                <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-                    The Bibliotek
-                </h1>
+            <SidebarProvider>
+                <Sidebar>
+                    <SidebarHeader />
+                    <SidebarContent>
+                        <SidebarGroup>
+                            <div className="flex flex-col gap-5">
+                                <CustomCheckbox
+                                    inputId="filter-tags-or"
+                                    text="Filtrar que contenga todas las etiquetas seleccionadas."
+                                    value={forceTagsFilter}
+                                    onChange={setForceTagsFilter}
+                                />
+                                <TagFilter
+                                    tagGroups={tagGroups}
+                                    tags={tags}
+                                    selectedTags={tagsFilter}
+                                    setSelectedTags={setTagsFilter}
+                                />
+                            </div>
+                        </SidebarGroup>
+                    </SidebarContent>
+                    <SidebarFooter />
+                </Sidebar>
 
-                <div className="flex flex-col gap-2">
-                    <div className="flex flex-row gap-5 max-w-4xl mx-auto">
-                        <InputGroup>
-                            <InputGroupInput
-                                value={textFilter}
-                                onChange={(e) => setTextFilter(e.target.value)}
-                                placeholder="Buscar..."
+                <main className="w-full px-20">
+                    <div className="w-full px-5 flex flex-col gap-10 pt-10 justify-center mx-auto">
+                        <h1 className="text-4xl font-extrabold tracking-tight text-balance">The Bibliotek</h1>
+
+                        <div className="flex flex-col gap-2">
+                            <div className="flex flex-row gap-5 max-w-xl">
+                                <InputGroup>
+                                    <InputGroupInput
+                                        value={textFilter}
+                                        onChange={(e) => setTextFilter(e.target.value)}
+                                        placeholder="Buscar..."
+                                    />
+                                    <InputGroupAddon>
+                                        <Search />
+                                    </InputGroupAddon>
+                                    <InputGroupAddon align="inline-end">
+                                        <div className="flex flex-row gap-5 px-2">
+                                            <CustomCheckbox
+                                                inputId="filter-name"
+                                                text="Nombre"
+                                                value={nameFilter}
+                                                onChange={setNameFilter}
+                                            />
+                                            <CustomCheckbox
+                                                inputId="filter-description"
+                                                text="Descripción"
+                                                value={descFilter}
+                                                onChange={setDescFilter}
+                                            />
+                                            <CustomCheckbox
+                                                inputId="filter-url"
+                                                text="Url"
+                                                value={urlFilter}
+                                                onChange={setUrlFilter}
+                                            />
+                                        </div>
+                                    </InputGroupAddon>
+                                </InputGroup>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-5 rounded-lg overflow-hidden">
+                            <DataTable
+                                columns={columns}
+                                data={links}
+                                perPage={perPage}
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                                onPerPageChange={setPerPage}
                             />
-                            <InputGroupAddon>
-                                <Search />
-                            </InputGroupAddon>
-                            <InputGroupAddon align="inline-end">
-                                <div className="flex flex-row gap-5 px-2">
-                                    <CustomCheckbox
-                                        inputId="filter-name"
-                                        text="Nombre"
-                                        value={nameFilter}
-                                        onChange={setNameFilter}
-                                    />
-                                    <CustomCheckbox
-                                        inputId="filter-description"
-                                        text="Descripción"
-                                        value={descFilter}
-                                        onChange={setDescFilter}
-                                    />
-                                    <CustomCheckbox
-                                        inputId="filter-url"
-                                        text="Url"
-                                        value={urlFilter}
-                                        onChange={setUrlFilter}
-                                    />
-                                </div>
-                            </InputGroupAddon>
-                        </InputGroup>
+                        </div>
                     </div>
-
-                    <CustomCheckbox
-                        inputId="filter-tags-or"
-                        text="Filtrar que contenga todas las etiquetas seleccionadas."
-                        value={forceTagsFilter}
-                        onChange={setForceTagsFilter}
-                    />
-
-                    <div className="flex flex-row flex-wrap gap-2 max-h-[10vh] overflow-auto">
-                        {tags.map((tag) => {
-                            if (tagsFilter.includes(tag.id)) {
-                                return (
-                                    <TagBadge tag={tag} selected={tagsFilter.includes(tag.id)} onClick={onTagClick} />
-                                )
-                            } else {
-                                return ''
-                            }
-                        })}
-                    </div>
-
-                    <Collapsible open={tagsOpen} onOpenChange={setTagsOpen} className="w-full flex  flex-col gap-2">
-                        <CollapsibleTrigger asChild>
-                            <Button variant="outline">
-                                <ChevronsUpDown />
-                                <span>Ver etiquetas</span>
-                            </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="flex flex-row flex-wrap gap-2">
-                            {tags.map((tag) => {
-                                return (
-                                    <TagBadge tag={tag} selected={tagsFilter.includes(tag.id)} onClick={onTagClick} />
-                                )
-                            })}
-                        </CollapsibleContent>
-                    </Collapsible>
-                </div>
-
-                <div className="flex flex-col gap-5">
-                    <DataTable
-                        columns={columns}
-                        data={links}
-                        perPage={perPage}
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                        onPerPageChange={setPerPage}
-                    />
-                </div>
-            </div>
+                </main>
+            </SidebarProvider>
         </>
     )
 }
