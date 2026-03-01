@@ -218,6 +218,19 @@ export default function HomePage() {
                                 totalPages={totalPages}
                                 onPageChange={setCurrentPage}
                                 onPerPageChange={setPerPage}
+                                tagsFilters={tagsFilter}
+                                onClickTag={(tagId: string) => {
+                                    if (tagsFilter.includes(tagId)) {
+                                        setTagsFilter((prev) => {
+                                            return prev.filter((elem) => elem != tagId)
+                                        })
+                                    } else {
+                                        setTagsFilter((prev) => {
+                                            if (prev.includes(tagId)) return prev
+                                            return [...prev, tagId]
+                                        })
+                                    }
+                                }}
                             />
                         </div>
                     </div>

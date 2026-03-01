@@ -1,6 +1,6 @@
 'use client'
 
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { type ColumnDef, flexRender, getCoreRowModel, type RowData, useReactTable } from '@tanstack/react-table'
 
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -14,6 +14,16 @@ interface DataTableProps<TData, TValue> {
     totalPages: number
     onPageChange: (page: number) => void
     onPerPageChange: (perPage: number) => void
+    tagsFilters: string[]
+    onClickTag: (id: string) => void
+}
+
+declare module '@tanstack/react-table' {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface TableMeta<TData extends RowData> {
+        tagsFilters: string[]
+        onClickTag: (id: string) => void
+    }
 }
 
 export function DataTable<TData, TValue>({
@@ -24,6 +34,8 @@ export function DataTable<TData, TValue>({
     totalPages,
     onPageChange,
     onPerPageChange,
+    tagsFilters,
+    onClickTag,
 }: DataTableProps<TData, TValue>) {
     const table = useReactTable({
         data,
@@ -46,6 +58,10 @@ export function DataTable<TData, TValue>({
 
             if (newPage !== currentPage) onPageChange(newPage)
             if (newPageSize !== perPage) onPerPageChange(newPageSize)
+        },
+        meta: {
+            tagsFilters: tagsFilters,
+            onClickTag: onClickTag,
         },
     })
 

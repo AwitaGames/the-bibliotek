@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import type Link from '@/types/link'
 import type Tag from '@/types/tags'
 import { type ColumnDef } from '@tanstack/react-table'
-import { ArrowUpRight, Clock, ClockArrowUp, Copy } from 'lucide-react'
+import { ArrowUpRight, Copy, Plus } from 'lucide-react'
 
 export const columns: ColumnDef<Link>[] = [
     {
@@ -18,29 +18,29 @@ export const columns: ColumnDef<Link>[] = [
 
             return (
                 <div className="flex flex-row min-w-75 gap-5">
-                    <div className="h-full w-30 object-contain overflow-hidden rounded-xl">
-                        <img src={row.original.og_image} className="" />
-                    </div>
-                    <div className="flex flex-col ">
-                        <div className="flex flex-row gap-2">
-                            <span className="font-bold text-lg">{name || ''} </span>
-                        </div>
-                        <div className="flex flex-row gap-1">
-                            <Popover>
-                                <PopoverTrigger>
-                                    <Clock size="1.25rem" />
-                                </PopoverTrigger>
-                                <PopoverContent>Creado: {createdDate.toLocaleString()}</PopoverContent>
-                            </Popover>
-                            <Popover>
-                                <PopoverTrigger>
-                                    <ClockArrowUp size="1.25rem" />
-                                </PopoverTrigger>
-                                <PopoverContent>Actualizado: {updatedDate.toLocaleString()}</PopoverContent>
-                            </Popover>
-                            <span className="text-wrap" dangerouslySetInnerHTML={{ __html: description }}></span>
-                        </div>
-                    </div>
+                    <Popover>
+                        <PopoverTrigger>
+                            <Plus />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-100 h-auto">
+                            <div className="flex flex-col gap-2 ">
+                                <div className="h-auto w-full object-contain object-center overflow-hidden rounded-xl">
+                                    <img src={row.original.og_image} className="mx-auto" />
+                                </div>
+                                <div className="text-xs">Creado: {createdDate.toLocaleString()}</div>
+                                <div className="text-xs">Actualizado: {updatedDate.toLocaleString()}</div>
+                                <div className="font-semibold">{name || 'Sin nombre'} </div>
+                                <div
+                                    className="text-wrap"
+                                    dangerouslySetInnerHTML={{ __html: description || 'Sin descripción' }}
+                                ></div>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+
+                    <a href={row.original.url} className="hover:underline" target="_blank">
+                        <span className="text-lg">{name || ''} </span>
+                    </a>
                 </div>
             )
         },
@@ -48,14 +48,23 @@ export const columns: ColumnDef<Link>[] = [
     {
         accessorKey: 'tags',
         header: 'Etiquetas',
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
             const tags: Tag[] = row.getValue('tags')
+            const selectedTags = table.options.meta?.tagsFilters || []
+            const onClickTag = table.options.meta?.onClickTag || undefined
 
             return (
                 <div key={row.id} className="flex flex-wrap gap-1 items-center min-w-75">
-                    {tags.map((tag) => (
-                        <TagBadge key={tag.id} tag={tag} />
-                    ))}
+                    {tags.map((tag) => {
+                        return (
+                            <TagBadge
+                                key={tag.id}
+                                selected={selectedTags.includes(tag.id)}
+                                onClick={onClickTag}
+                                tag={tag}
+                            />
+                        )
+                    })}
                 </div>
             )
         },

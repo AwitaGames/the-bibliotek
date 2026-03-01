@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge'
 import type Tag from '@/types/tags'
 import { CheckCircle } from 'lucide-react'
 
@@ -18,18 +17,16 @@ export default function TagBadge({
     }
 
     return (
-        <Badge
+        <div
             key={tag.id}
-            className={`cursor-pointer select-none border-2 px-2 font-normal ${selected && 'font-semibold underline'}`}
-            variant={selected ? 'secondary' : 'outline'}
+            className={`flex flex-row flex-nowrap items-center gap-1 cursor-pointer text-wrap select-none border-0 p-0 font-normal hover:underline ${selected && 'font-semibold underline'}`}
             onClick={() => onTagClick()}
             style={{
-                borderColor: tag.color ? tag.color : tag.tag_group?.color,
                 color: tag.color ? tag.color : tag.tag_group?.color,
             }}
         >
             {selected && <CheckCircle className="w-4! h-4! text-white" />}
             {tag.name}
-        </Badge>
+        </div>
     )
 }
