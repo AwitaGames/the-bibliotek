@@ -15,7 +15,9 @@ export default function CustomCheckbox({
     return (
         <div className="flex items-center gap-3">
             <Checkbox id={inputId} checked={value} onCheckedChange={(isChecked) => onChange(!!isChecked)} />
-            <Label htmlFor="terms">{text}</Label>
+            <Label className="font-normal" htmlFor="terms">
+                {text}
+            </Label>
         </div>
     )
 }

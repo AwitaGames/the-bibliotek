@@ -4,7 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family:
+        Fira Code,
+        system-ui,
+        Avenir,
+        Helvetica,
+        Arial,
+        sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
@@ -164,6 +170,6 @@ thead th {
 }
 
 div[data-slot='sidebar'] {
-    --sidebar-width: 25rem;
+    --sidebar-width: 30vw;
     --sidebar-width-mobile: 20rem;
 }

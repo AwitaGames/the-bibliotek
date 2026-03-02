@@ -1,39 +1,16 @@
 import TagBadge from '@/components/custom-ui/tag-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import type TagGroup from '@/types/tag-groups'
-import type Tag from '@/types/tags'
+import { usePocketbase } from '@/pocketbase/PocketbaseContext'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 
-export default function TagFilter({
-    tagGroups,
-    tags,
-    selectedTags,
-    setSelectedTags,
-}: {
-    tagGroups: TagGroup[]
-    tags: Tag[]
-    selectedTags: string[]
-    setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>
-}) {
+export default function TagFilter() {
     const [textFilter, setTextFilter] = useState('')
-
-    const onTagClick = (tagId: string) => {
-        if (selectedTags.includes(tagId)) {
-            setSelectedTags((prev) => {
-                return prev.filter((elem) => elem != tagId)
-            })
-        } else {
-            setSelectedTags((prev) => {
-                if (prev.includes(tagId)) return prev
-                return [...prev, tagId]
-            })
-        }
-    }
+    const { tagGroups, tags } = usePocketbase()
 
     return (
-        <div className="flex flex-col gap-2 w-full h-full">
+        <div className="flex flex-col gap-3 w-full h-full">
             <div className="flex flex-row gap-2">
                 <Input
                     type="text"
@@ -46,9 +23,9 @@ export default function TagFilter({
                 </Button>
             </div>
             {tagGroups.map((tagGroup) => (
-                <div className="flex flex-col bg-secondary rounded-xl p-3">
+                <div className="flex flex-col">
                     <div className="text-sm text-primary/70 font-semibold uppercase">{tagGroup.name}</div>
-                    <div className="grid grid-cols-2 flex-wrap gap-1 space-x-2 mt-1">
+                    <div className="flex flex-row flex-wrap gap-1 space-x-2 mt-1">
                         {tags.map((tag) => {
                             if (tag.tag_group?.id === tagGroup.id) {
                                 if (
@@ -57,14 +34,7 @@ export default function TagFilter({
                                 ) {
                                     return
                                 }
-                                return (
-                                    <TagBadge
-                                        key={tag.id}
-                                        tag={tag}
-                                        selected={selectedTags.includes(tag.id)}
-                                        onClick={onTagClick}
-                                    />
-                                )
+                                return <TagBadge key={tag.id} tag={tag} />
                             }
                         })}
                     </div>
