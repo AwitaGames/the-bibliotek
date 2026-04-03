@@ -23,7 +23,6 @@ onRecordAfterCreateSuccess((e) => {
                     { name: 'Url', value: record.getString('url') || 'N/A', inline: false },
                     { name: 'Tags', value: tagNames || 'Sin tags', inline: false },
                 ],
-                timestamp: new Date().toISOString(),
             },
         ],
     })
